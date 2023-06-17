@@ -9,6 +9,8 @@ class Despesa {
     }
 }
 
+
+
 function cadastrarDespesa() {
     //Guarda informações inseridas pelo usuário em variáveis
     let dia = document.getElementById('dia')
