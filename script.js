@@ -28,11 +28,13 @@ class BancoDeDados {
             localStorage.setItem('id', 0)
         }
     }
+
     //atualiza a chave id para evitar sobrescrever ao fazer novos registros
     getProximoID() {
         let idAtual = localStorage.getItem('id')
         return parseInt(idAtual) + 1
     }
+
     //Registra o objeto passado por parâmetro no localStorage do navegador
     //já que ainda não aprendemos a utilizar Banco de Dados SQL
     //Na verdade, o objeto é convertido para uma string JSON antes de ser registrado
@@ -40,6 +42,21 @@ class BancoDeDados {
         let proximoID = this.getProximoID()
         localStorage.setItem(proximoID, JSON.stringify(despesa))
         localStorage.setItem('id', proximoID)
+    }
+
+    recuperarRegistros() {
+        let index = localStorage.getItem('id')
+        let arrayDespesas = Array()
+
+        for (let i = 1; i <= index; i++) {
+            let despesa = JSON.parse(localStorage.getItem(i))
+            
+            if (despesa === null) {
+                continue
+            }
+            arrayDespesas.push(despesa)
+        }
+        console.log(arrayDespesas)
     }
 }
 
@@ -53,6 +70,7 @@ function cadastrarDespesa() {
     let tipo = document.getElementById('tipo')
     let descricao = document.getElementById('descricao')
     let valor = document.getElementById('valor')
+
     //Utiliza essas informações para construir um objeto Despesa
     let despesa = new Despesa(
         ano.value,
@@ -62,6 +80,7 @@ function cadastrarDespesa() {
         descricao.value,
         valor.value
     )
+
    if(despesa.validarDados()) {
         //Repassa o objeto Despesa criado como parâmetro para a função registrarLancamento()
         bd.registrarLancamento(despesa)
@@ -83,4 +102,8 @@ function cadastrarDespesa() {
         document.getElementById('modal-button').innerHTML = 'Voltar'
         $('#modalRegistroDespesa').modal('show')
     }
+}
+
+function carregarListaDespesas() {
+    bd.recuperarRegistros()
 }
