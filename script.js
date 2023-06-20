@@ -35,15 +35,18 @@ class BancoDeDados {
         return parseInt(idAtual) + 1
     }
 
-    //Registra o objeto passado por parâmetro no localStorage do navegador
-    //já que ainda não aprendemos a utilizar Banco de Dados SQL
-    //Na verdade, o objeto é convertido para uma string JSON antes de ser registrado
+    /*Registra o objeto passado por parâmetro no localStorage do navegador
+    já que ainda não aprendemos a utilizar Banco de Dados SQL
+    Na verdade, o objeto é convertido para uma string JSON antes de ser registrado*/
     registrarLancamento(despesa) {
         let proximoID = this.getProximoID()
         localStorage.setItem(proximoID, JSON.stringify(despesa))
         localStorage.setItem('id', proximoID)
     }
 
+    /*recupera o valor de idAtual e o utiliza como index no laço for
+    que converterá os valores JSON do localStorage para objetos literais
+    e armazenar num array*/
     recuperarRegistros() {
         let index = localStorage.getItem('id')
         let arrayDespesas = Array()
@@ -51,12 +54,13 @@ class BancoDeDados {
         for (let i = 1; i <= index; i++) {
             let despesa = JSON.parse(localStorage.getItem(i))
             
-            if (despesa === null) {
-                continue
+            //controle para não armazenar registros nulos (que foram excluídos)
+            if (despesa != null) {
+                arrayDespesas.push(despesa)
             }
-            arrayDespesas.push(despesa)
         }
-        console.log(arrayDespesas)
+
+        return arrayDespesas
     }
 }
 
@@ -79,18 +83,26 @@ function cadastrarDespesa() {
         tipo.value,
         descricao.value,
         valor.value
-    )
+        )
 
    if(despesa.validarDados()) {
-        //Repassa o objeto Despesa criado como parâmetro para a função registrarLancamento()
+       //Repassa o objeto Despesa criado como parâmetro para a função registrarLancamento()
         bd.registrarLancamento(despesa)
-
+        
         //dispara caixa de diálogo ao usuário, personalizado com textos positivos
         document.getElementById('modal-titulo-div').className = "modal-header text-success"
         document.getElementById('modal-titulo').innerHTML = "Registro concluído"
         document.getElementById('modal-body').innerHTML = 'Despesa foi registrada com sucesso.'
         document.getElementById('modal-button').className = "btn btn-success"
         document.getElementById('modal-button').innerHTML = "OK"
+
+        //limpar campos após registro
+        ano.value = ''
+        mes.value = ''
+        dia.value = ''
+        tipo.value = ''
+        descricao.value = ''
+        valor.value = ''
         $('#modalRegistroDespesa').modal('show')
     } else {
         
@@ -105,5 +117,40 @@ function cadastrarDespesa() {
 }
 
 function carregarListaDespesas() {
-    bd.recuperarRegistros()
+    //array para armazenar objetos literais retornados da função recuperarRegistros()
+    let arrayDespesas = Array()
+    arrayDespesas = bd.recuperarRegistros()
+
+
+    let corpoTabela = document.getElementById("corpo-tabela")
+
+    //laço para exibir cada registro por linha
+    arrayDespesas.forEach(function(despesa) {
+        let linha = corpoTabela.insertRow()
+
+        linha.insertCell(0).innerHTML = `${despesa.dia}/${despesa.mes}/${despesa.ano}` 
+
+        //converter números em texto explicativo do campo "Tipo"
+        switch(despesa.tipo) {
+            case '1': 
+                despesa.tipo = 'Alimentação' 
+                break
+            case '2': 
+                despesa.tipo = 'Educação' 
+                break
+            case '3': 
+                despesa.tipo = 'Lazer'
+                break
+            case '4': 
+                despesa.tipo = 'Saúde'
+                break
+            case '5': 
+                despesa.tipo = 'Transporte'
+                break
+            }
+
+        linha.insertCell(1).innerHTML = despesa.tipo
+        linha.insertCell(2).innerHTML = despesa.descricao
+        linha.insertCell(3).innerHTML = despesa.valor
+    })
 }
