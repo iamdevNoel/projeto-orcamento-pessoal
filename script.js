@@ -62,6 +62,15 @@ class BancoDeDados {
 
         return arrayDespesas
     }
+
+    pesquisar(despesaPesquisada) {
+        let todasDespesas = this.recuperarRegistros()
+        let despesasFiltradas = []
+
+        despesasFiltradas = todasDespesas.filter(function(i) {return i.tipo == despesaPesquisada.tipo})
+        //localStorage.getItem()
+        console.log(despesasFiltradas)
+    }
 }
 
 let bd = new BancoDeDados()
@@ -116,10 +125,15 @@ function cadastrarDespesa() {
     }
 }
 
-function carregarListaDespesas() {
+function carregarListaDespesas(despesasFiltradas) {
     //array para armazenar objetos literais retornados da função recuperarRegistros()
     let arrayDespesas = Array()
-    arrayDespesas = bd.recuperarRegistros()
+
+    if (despesasFiltradas == null) {
+        arrayDespesas = bd.recuperarRegistros()
+    } else {
+        arrayDespesas = despesasFiltradas
+    }
 
 
     let corpoTabela = document.getElementById("corpo-tabela")
@@ -153,4 +167,16 @@ function carregarListaDespesas() {
         linha.insertCell(2).innerHTML = despesa.descricao
         linha.insertCell(3).innerHTML = despesa.valor
     })
+}
+
+function pesquisarDespesas() {
+    let ano = document.getElementById('ano').value
+    let mes = document.getElementById('mes').value
+    let dia = document.getElementById('dia').value
+    let tipo = document.getElementById('tipo').value
+    let descricao = document.getElementById('descricao').value
+    let valor = document.getElementById('valor').value
+
+    let despesaPesquisada = new Despesa(ano, mes, dia, tipo, descricao, valor)
+    bd.pesquisar(despesaPesquisada)
 }
