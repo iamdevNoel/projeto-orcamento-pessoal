@@ -64,12 +64,39 @@ class BancoDeDados {
     }
 
     pesquisar(despesaPesquisada) {
-        let todasDespesas = this.recuperarRegistros()
-        let despesasFiltradas = []
+        let despesasFiltradas = this.recuperarRegistros()
 
-        despesasFiltradas = todasDespesas.filter(function(i) {return i.tipo == despesaPesquisada.tipo})
-        //localStorage.getItem()
+        /*if (despesaPesquisada.ano != "") {
+            despesasFiltradas.filter(i => i.ano == despesaPesquisada.ano)
+        }
+        if (despesaPesquisada.mes != "") {
+            despesasFiltradas.filter(i => i.mes == despesaPesquisada.mes)
+        }
+        if (despesaPesquisada.dia != "") {
+            despesasFiltradas.filter(i => i.dia == despesaPesquisada.dia)
+        }
+        if (despesaPesquisada.tipo != "") {
+            despesasFiltradas.filter(i => i.tipo == despesaPesquisada.tipo)
+        }
+        if (despesaPesquisada.descricao != "") {
+            despesasFiltradas.filter(i => i.descricao == despesaPesquisada.descricao)
+        }
+        if (despesaPesquisada.valor != "") {
+            despesasFiltradas.filter(i => i.valor == despesaPesquisada.valor)
+        }*/
+
+        for (let i in despesaPesquisada) {
+            filtrar(i)
+        }
+
+        function filtrar(atributo) {
+            if (despesaPesquisada[atributo] != "") {
+                despesasFiltradas = despesasFiltradas.filter(i => i[atributo] == despesaPesquisada[atributo])
+            }
+        }
+
         console.log(despesasFiltradas)
+        return despesasFiltradas
     }
 }
 
@@ -125,16 +152,12 @@ function cadastrarDespesa() {
     }
 }
 
-function carregarListaDespesas(despesasFiltradas) {
+function carregarListaDespesas(arrayDespesas = []) {
     //array para armazenar objetos literais retornados da função recuperarRegistros()
-    let arrayDespesas = Array()
 
-    if (despesasFiltradas == null) {
+    if (arrayDespesas.length == 0) {
         arrayDespesas = bd.recuperarRegistros()
-    } else {
-        arrayDespesas = despesasFiltradas
     }
-
 
     let corpoTabela = document.getElementById("corpo-tabela")
 
@@ -178,5 +201,23 @@ function pesquisarDespesas() {
     let valor = document.getElementById('valor').value
 
     let despesaPesquisada = new Despesa(ano, mes, dia, tipo, descricao, valor)
-    bd.pesquisar(despesaPesquisada)
+    
+    if (
+        despesaPesquisada.ano == "" &&
+        despesaPesquisada.mes == "" &&
+        despesaPesquisada.dia == "" &&
+        despesaPesquisada.tipo == "" &&
+        despesaPesquisada.descricao == "" &&
+        despesaPesquisada.valor == ""
+    ) {
+        window.alert('Preencha no mínimo um dos campos do formulário para filtrar sua pesquisa adequadamente.')
+    } else {
+        despesasFiltradas = bd.pesquisar(despesaPesquisada)
+        if (despesasFiltradas.length < 1) {
+            document.getElementById("corpo-tabela").innerHTML = "Nenhum resultado encontrado"
+        } else {
+            document.getElementById("corpo-tabela").innerHTML = ""
+            carregarListaDespesas(despesasFiltradas)
+        }
+    }
 }
