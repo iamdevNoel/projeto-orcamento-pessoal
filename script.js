@@ -56,6 +56,7 @@ class BancoDeDados {
             
             //controle para não armazenar registros nulos (que foram excluídos)
             if (despesa != null) {
+                despesa.id = i
                 arrayDespesas.push(despesa)
             }
         }
@@ -97,6 +98,10 @@ class BancoDeDados {
 
         console.log(despesasFiltradas)
         return despesasFiltradas
+    }
+
+    removerDespesa(id) {
+        localStorage.removeItem(id)
     }
 }
 
@@ -188,6 +193,19 @@ function carregarListaDespesas(arrayDespesas = []) {
         linha.insertCell(1).innerHTML = despesa.tipo
         linha.insertCell(2).innerHTML = despesa.descricao
         linha.insertCell(3).innerHTML = despesa.valor
+
+        //criar elemento HTML botão para excluir lançamentos
+        let botaoExcluir = document.createElement('button')
+        botaoExcluir.className = "btn btn-danger"
+        botaoExcluir.innerHTML = '<i class="fas fa-times"></i>'
+        botaoExcluir.id = `id-despesa-${despesa.id}`
+        botaoExcluir.onclick = function () {
+            //para entregar ao removerDespesa() somente o número do id, sem o prefixo 'id-despesa-'
+            let idCorrigida = botaoExcluir.id.replace('id-despesa-', '') 
+            bd.removerDespesa(idCorrigida)
+            window.location.reload()
+        }
+        linha.insertCell(4).append(botaoExcluir)
     })
 }
 
