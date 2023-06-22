@@ -141,7 +141,6 @@ function cadastrarDespesa() {
         valor.value = ''
         $('#modalRegistroDespesa').modal('show')
     } else {
-        
         //dispara caixa de diálogo ao usuário, personalizado com textos positivos
         document.getElementById('modal-titulo-div').className = "modal-header text-danger"
         document.getElementById('modal-titulo').innerHTML = "Erro ao cadastrar despesa"
@@ -153,8 +152,8 @@ function cadastrarDespesa() {
 }
 
 function carregarListaDespesas(arrayDespesas = []) {
-    //array para armazenar objetos literais retornados da função recuperarRegistros()
-
+    //se o array recebido por parâmetro estiver vazio,
+    //será exibido todos os registros, sem filtragem
     if (arrayDespesas.length == 0) {
         arrayDespesas = bd.recuperarRegistros()
     }
@@ -200,9 +199,10 @@ function pesquisarDespesas() {
     let descricao = document.getElementById('descricao').value
     let valor = document.getElementById('valor').value
 
+    //cria um objeto-modelo com os atributos informados nos campos de filtragem
     let despesaPesquisada = new Despesa(ano, mes, dia, tipo, descricao, valor)
     
-    if (
+    if ( //verifica se os filtros estão vazios
         despesaPesquisada.ano == "" &&
         despesaPesquisada.mes == "" &&
         despesaPesquisada.dia == "" &&
@@ -212,7 +212,11 @@ function pesquisarDespesas() {
     ) {
         window.alert('Preencha no mínimo um dos campos do formulário para filtrar sua pesquisa adequadamente.')
     } else {
+        //o objeto-modelo despesaPesquisada é enviado por parâmetro para o método pesquisar
+        //lá, ele será comparado com cada registro e, no caso de semelhança, será agrupado numa array de objetos
+        //array despesasFiltradas recebe essa array de objetos semelhantes à despesaPesquisada
         despesasFiltradas = bd.pesquisar(despesaPesquisada)
+        //se despesasFiltradas estiver vazio, nenhum item semelhante à pesquisa foi encontrado
         if (despesasFiltradas.length < 1) {
             document.getElementById("corpo-tabela").innerHTML = "Nenhum resultado encontrado"
         } else {
